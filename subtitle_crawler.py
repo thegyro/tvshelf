@@ -4,11 +4,15 @@ import zipfile
 import os
 from bs4 import BeautifulSoup
 
+#woudln't generally want to use globals
 subtitle_url = 'http://subscene.com'
 
 def get_subtitle_zip(tvshow):
     path = '/subtitles/release?'
-    show = tvshow['show'] + ' ' + tvshow['showid']
+    if tvshow['showid']:
+        show = tvshow['show'] + ' ' + tvshow['showid']
+    else:
+        show = tvshow['show'] + ' ' + tvshow['res']
     query = urllib.urlencode({'q':show})
     print subtitle_url + path + query
     request = urllib2.Request(subtitle_url + path + query)
@@ -26,15 +30,23 @@ def get_subtitle_zip(tvshow):
     sub_resp_soup = BeautifulSoup(urllib2.urlopen(subtitle_url + link_path))
     download_link_path = str(sub_resp_soup.find_all('div',class_='download')[0].a['href'])
 
-    filename = tvshow['show'] + ' ' + tvshow['showid'] + '.zip'
+    filename = '/home/pydomic/Desktop/TV/' + tvshow['show'] + ' ' + tvshow['showid'] + '.zip'
+    print "\n Downloading the required subtitle... \n"
     urllib.urlretrieve(subtitle_url + download_link_path,filename)
     return filename
     
 def extract_subtitle(filename):
     try:
         with zipfile.ZipFile(filename,'r') as fzip:
-            fzip.extractall()
+            print "Extracting the subtitle... \n"
+            fzip.extractall('/home/pydomic/Desktop/TV/')
+            print "Removing the useless zip file... \n"
             os.remove(filename)
+            print "Done! Yay!! \n"
+            name = fzip.namelist()[0]
+            print "Fuck",name
+            return '/home/pydomic/Desktop/TV/' + name
+
     except (IOError,zipfile.BadZipfile,zipfile.LargeZipFile) as err:
         print str(err)
         
@@ -46,7 +58,7 @@ def match_subtitle(links,tvshow):
         check_name = tvshow['show'] + ' ' + tvshow['showid']
         link_str = str(link[1])
         if check_name.replace(' ','.') in link_str:
-            if tvshow['res'] in link_str  and tvshow['encoding'] in link_str:
+            if tvshow['res'] in link_str  and (tvshow['encoding'] in link_str or tvshow['encoding'].capitalize() in link_str):
                 match_links_best.append(link)
             elif tvshow['res'] in link_str or tvshow['encoding'] in link_str:
                 match_links_ok.append(link)
@@ -61,4 +73,3 @@ def match_subtitle(links,tvshow):
         return match_links_fuck[0]
     else:
         return None
-        
