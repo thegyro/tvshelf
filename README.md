@@ -9,4 +9,4 @@ TO-DO
 
 2. The code as of now is very brittle ,more like a hack. Should implement it in a better way - write more exception catchers,design the inputs in a more Object Oriented way.
 
-3. Should cover a more formats in which a TV show can be named.
+3. Should cover a more formats in which a TV show can be named. (The regex we have written now is a bit dirty ,we have to clean that up.)
