@@ -2,10 +2,11 @@ import urllib2
 import urllib
 import os
 
+ source_dir = '/home/pydomic/Desktop/TV/'
+ 
 def get_hash(name):
     readsize = 64*1024
     try:
-        source_dir = '/home/pydomic/Desktop/TV/'
         fullname = os.path.join(source_dir,name)
         with open(fullname,'rb') as f:
             size = os.path.getsize(fullname)
@@ -27,7 +28,7 @@ def get_subtitle(filename):
         request.add_header('User-Agent','SubDB/1.0 (tvshelf/0.1; http://github.com/thegyro/tvshelf)')
         response = urllib2.urlopen(request)
         if response.getcode() == 200:
-            with open(filename + '.srt','w') as sub_f:
+            with open(os.path.join(source_dir,filename + '.srt','w')) as sub_f:
                 f.write(response.read())
     
         elif reponse.getcode() == 404:
@@ -38,8 +39,3 @@ def get_subtitle(filename):
             
     except (urllib2.URLError,Exception,IOError) as err:
         print str(err)
-    
-    
-            
-            
-            
